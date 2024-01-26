@@ -64,6 +64,7 @@ const findUserByIdAndJob = (id, job) =>
   users["users_list"].find((user) => user["id"] === id) && 
   users["users_list"].find((user) => user["job"] === job);
 
+/*Search By Id and Job*/
 app.get("/users/:id/:job", (req, res) => {
   const id = req.params["id"]; //or req.params.id
   const job = req.params["job"];
@@ -77,24 +78,47 @@ app.get("/users/:id/:job", (req, res) => {
 
 
 app.get("/users/:id", (req, res) => {
-const id = req.params["id"]; //or req.params.id
-let result = findUserById(id);
-if (result === undefined) {
-    res.status(404).send("Resource not found.");
-} else {
-    res.send(result);
-}
+    const id = req.params["id"]; //or req.params.id
+    let result = findUserById(id);
+    if (result === undefined) {
+        res.status(404).send("Resource not found.");
+    } else {
+        res.send(result);
+    }
 });
 
 const addUser = (user) => {
-users["users_list"].push(user);
-return user;
+    users["users_list"].push(user);
+    return user;
 };
 
 app.post("/users", (req, res) => {
-const userToAdd = req.body;
-addUser(userToAdd);
-res.send();
+    const userToAdd = req.body;
+    addUser(userToAdd);
+    res.send();
+});
+
+/*Delete A User*/
+
+const removeUser = (id) => {
+    const index = users.users_list.findIndex(user => user.id === id);
+    if (index !== -1) {
+      // If user is found, remove it from the array
+      users.users_list.splice(index, 1);
+    }
+};
+
+
+app.delete("/users/:id", (req, res) => {
+    const id = req.params["id"]; //or req.params.id
+    let result = findUserById(id);
+    if (result === undefined) {
+        res.status(404).send("Resource not found.");
+    } else {
+        /*What goes here?*/
+        removeUser(id);
+        res.send("User deleted successfully.");
+    }
 });
 
 
