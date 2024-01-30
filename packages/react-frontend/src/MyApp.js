@@ -28,7 +28,6 @@ function MyApp() {
     });
     setCharacters(updated);
     }
-
     
     function fetchUsers() {
       const promise = fetch("http://localhost:8000/users");
@@ -43,13 +42,18 @@ function MyApp() {
         },
         body: JSON.stringify(person),
       });
-  
       return promise;
     }
 
-    function updateList(person) { 
+    function updateList(person){ 
       postUser(person)
-        .then(() => setCharacters([...characters, person]))
+        .then(response => {
+          if (response.status === 201) {
+            setCharacters([...characters, person]);
+          } else {
+            console.error('Person not created:', response.status);
+          }
+        })
         .catch((error) => {
           console.log(error);
         })
