@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm start -w express-backend"
+    "back": "npm start -w express-backend",
+    "front": "npm start -w react-frontend"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +14,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "cors": "^2.8.5",
     "create-react-app": "^5.0.1"
   },
   "devDependencies": {
