@@ -90,7 +90,7 @@ app.get("/users/:id", (req, res) => {
 });
 
 const addUser = (user) => {
-    user.id = Math.random();
+    user.id = `${Math.random()}`;
     users["users_list"].push(user);
     return user;
 };
@@ -122,7 +122,7 @@ app.delete("/users/:id", (req, res) => {
         res.status(404).send("Resource not found.");
     } else {
         removeUser(id);
-        res.send("User deleted successfully.");
+        res.status(204).send();
     }
 });
 

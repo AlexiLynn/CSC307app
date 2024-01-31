@@ -23,10 +23,16 @@ function MyApp() {
   );
 
     function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
-    });
-    setCharacters(updated);
+      let id = characters[index].id;
+      const promise = fetch(`http://localhost:8000/users/${id}`, {
+        method: "DELETE"
+      });
+      promise.then((response) => {if(response.status === 204){
+        const updated = characters.filter((character, i) => {
+          return i !== index;
+        });
+        setCharacters(updated);
+      }})
     }
     
     function fetchUsers() {
