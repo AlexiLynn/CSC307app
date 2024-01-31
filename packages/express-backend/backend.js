@@ -90,6 +90,7 @@ app.get("/users/:id", (req, res) => {
 });
 
 const addUser = (user) => {
+    user.id = Math.random();
     users["users_list"].push(user);
     return user;
 };
@@ -98,7 +99,7 @@ app.post("/users", (req, res) => {
     const userToAdd = req.body;
     let result = addUser(userToAdd);
     if(result !== undefined){
-      res.status(201);
+      res.status(201).send(result);
     }
     res.send();
 });

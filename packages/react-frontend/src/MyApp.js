@@ -49,17 +49,17 @@ function MyApp() {
       postUser(person)
         .then(response => {
           if (response.status === 201) {
-            setCharacters([...characters, person]);
+            return response.json();
           } else {
             console.error('Person not created:', response.status);
           }
         })
+        .then((json) => setCharacters([...characters, json])) //We have to wait for json
         .catch((error) => {
           console.log(error);
         })
     }
 
 }
-
 
 export default MyApp;
