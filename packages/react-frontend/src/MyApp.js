@@ -23,7 +23,7 @@ function MyApp() {
   );
 
     function removeOneCharacter(index) {
-      let id = characters[index].id;
+      let id = characters[index]._id;
       const promise = fetch(`http://localhost:8000/users/${id}`, {
         method: "DELETE"
       });

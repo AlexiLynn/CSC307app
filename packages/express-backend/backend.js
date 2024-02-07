@@ -1,6 +1,7 @@
 // backend.js
 import express from "express";
 import cors from "cors";
+import user from "./user-services.js"
 
 const users = {
     users_list: [
@@ -42,66 +43,67 @@ app.get("/", (req, res) => {
   res.send("Hello to the person grading my assignment! I am happy you are here.");
 });
 
-const findUserByName = (name) => {
-return users["users_list"].filter(
-    (user) => user["name"] === name
-);
-};
-
-app.get("/users", (req, res) => {
+app.get("/users", (req, res) => { /*DONE*/
 const name = req.query.name;
 if (name != undefined) {
-    let result = findUserByName(name);
-    result = { users_list: result };
-    res.send(result);
+    user.findUserByName(name).then((result) => {
+      result = { users_list: result };
+      res.send(result);
+    })
 } else {
-    res.send(users);
+    user.getUsers().then((result) => {
+      result = { users_list: result };
+      res.send(result);
+    });
 }
 });
 
-const findUserById = (id) =>
+const findUserById = (id) => /*DONE*/
   users["users_list"].find((user) => user["id"] === id);
 
-const findUserByIdAndJob = (id, job) =>
-  users["users_list"].find((user) => user["id"] === id) && 
-  users["users_list"].find((user) => user["job"] === job);
-
 /*Search By Id and Job*/
-app.get("/users/:id/:job", (req, res) => {
-  const id = req.params["id"]; //or req.params.id
+app.get("/users/:_id/:job", (req, res) => {
+  const id = req.params["_id"];
   const job = req.params["job"];
-  let result = findUserByIdAndJob(id, job);
-  if (result === undefined) {
-    res.status(404).send("Resource not found.");
-  } else {
-    res.send(result);
-  }
-});
 
-
-app.get("/users/:id", (req, res) => {
-    const id = req.params["id"]; //or req.params.id
-    let result = findUserById(id);
-    if (result === undefined) {
+  // Use Promise.all to execute both functions concurrently
+  Promise.all([
+    user.findUserById(id),
+    user.findUserByJob(job)
+  ])
+  .then(([userById, userByJob]) => {
+    if (userById && userByJob) {
+      // If both results are found, return either (I chose by id becuase it is more likely to be unique)
+      user.findUserById(id).then((result) =>{ if (result === undefined) {
         res.status(404).send("Resource not found.");
-    } else {
+      } else {
         res.send(result);
+      }})
+    } else {
+      // If any result is missing, send 404
+      res.status(404).send("Resource not found.");
     }
-});
+})});
 
-const addUser = (user) => {
-    user.id = `${Math.random()}`;
-    users["users_list"].push(user);
-    return user;
-};
+app.get("/users/:_id", (req, res) => { /*DONE*/
+    const id = req.params["_id"]; //or req.params.id
+    user.findUserById(id).then((result) =>{ if (result === undefined) {
+      res.status(404).send("Resource not found.");
+    } else {
+      res.send(result);
+    }
+})}
+);
 
-app.post("/users", (req, res) => {
+app.post("/users", (req, res) => { /*DONE*/
     const userToAdd = req.body;
-    let result = addUser(userToAdd);
-    if(result !== undefined){
-      res.status(201).send(result);
-    }
-    res.send();
+    user.id = `${Math.random()}`;
+    user.addUser(userToAdd).then((result) => {
+      if(result !== undefined){
+        res.status(201).send(result);
+      }
+      res.send();
+    })
 });
 
 /*Delete A User*/
@@ -114,16 +116,16 @@ const removeUser = (id) => {
     }
 };
 
-
-app.delete("/users/:id", (req, res) => {
-    const id = req.params["id"]; //or req.params.id
-    let result = findUserById(id);
-    if (result === undefined) {
+app.delete("/users/:_id", (req, res) => {
+    const id = req.params["_id"];
+    user.findUserByIdAndDelete(id).then((result) => {
+      if(result === undefined){
         res.status(404).send("Resource not found.");
-    } else {
-        removeUser(id);
+      }
+      else{
         res.status(204).send();
-    }
+      }
+    })
 });
 
 
